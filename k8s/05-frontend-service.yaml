@@ -1,0 +1,16 @@
+# NodePort exposes the Service on every node's IP at a fixed port (30080),
+# so you can reach it from outside the cluster without an Ingress controller
+# — good enough for a workshop demo.
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: kube-workshop
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080

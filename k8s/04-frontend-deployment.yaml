@@ -1,0 +1,25 @@
+# Same Deployment/Pod/label pattern as the backend, for the React+nginx image.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: kube-workshop
+  labels:
+    app: frontend
+  annotations:
+    description: "React employee dashboard, served by nginx"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/k1m0ch1/kube-workshop-frontend:latest
+          ports:
+            - containerPort: 80

@@ -1,0 +1,7 @@
+# NAMESPACE
+# A namespace is a virtual cluster inside your cluster — it groups and
+# isolates resources so different teams/projects don't collide on names.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-workshop

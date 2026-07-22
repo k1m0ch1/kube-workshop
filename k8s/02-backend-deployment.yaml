@@ -1,0 +1,38 @@
+# DEPLOYMENT (manages Pods)
+# A Pod is the smallest deployable unit — one or more containers that share
+# network/storage. You rarely create Pods directly; a Deployment wraps a Pod
+# template and keeps N replicas of it running, handling restarts/rollouts.
+#
+# LABELS: key-value tags attached to objects (metadata.labels / the pod
+# template's labels). They don't do anything by themselves — other objects
+# (like Services) use SELECTORS to find pods by matching these labels.
+#
+# ANNOTATIONS: also key-value metadata, but NOT used for selection — just
+# free-form info for humans/tools (docs, owner, build info, etc).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: kube-workshop
+  labels:
+    app: backend
+  annotations:
+    description: "FastAPI + SQLite employee management API"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend       # must match the Pod template's labels below
+  template:
+    metadata:
+      labels:
+        app: backend      # this is what the Service selector will match
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/k1m0ch1/kube-workshop-backend:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: employee-app-secret   # injects ADMIN_USER/ADMIN_PASSWORD as env vars

@@ -1,0 +1,17 @@
+# SERVICE + SELECTOR
+# A Service gives a stable network name/IP in front of a set of Pods.
+# Pods come and go (rescheduled, restarted) with changing IPs — the Service's
+# `selector` picks any Pod whose labels match, and load-balances across them.
+# ClusterIP (default) is only reachable from inside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: kube-workshop
+spec:
+  type: ClusterIP
+  selector:
+    app: backend   # matches the "app: backend" label on the backend Pods
+  ports:
+    - port: 8000
+      targetPort: 8000
