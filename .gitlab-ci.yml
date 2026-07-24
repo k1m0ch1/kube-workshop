@@ -36,3 +36,9 @@ build-frontend:
   variables:
     SERVICE_NAME: frontend
     BUILD_CONTEXT: ./frontend
+
+build-taskmanagement:
+  <<: *build_template
+  variables:
+    SERVICE_NAME: taskmanagement
+    BUILD_CONTEXT: ./taskmanagement
