@@ -1,10 +1,12 @@
 FROM php:8.2-fpm
 
-# Install PostgreSQL driver + system deps
+# Install system deps + PHP extensions required by Laravel 11
 RUN apt-get update && apt-get install -y \
-    libpq-dev unzip curl \
-    && docker-php-ext-install pdo pdo_pgsql \
-    && apt-get clean
+    libpq-dev libzip-dev libonig-dev libxml2-dev unzip curl \
+    && docker-php-ext-install \
+        pdo pdo_pgsql \
+        mbstring zip xml dom bcmath opcache \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer \
