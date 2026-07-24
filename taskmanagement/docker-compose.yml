@@ -1,47 +1,45 @@
 services:
+
+  # --- PHP Application (Laravel) ---
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      # To build using SSH git clone from a private repo:
-      #   docker compose build --ssh default
-      # ssh:
-      #   - default
-    image: taskmanagement:latest
-    container_name: taskmanagement
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: taskmanagement
+      DB_USERNAME: laravel
+      DB_PASSWORD: secret
+
+  # --- Web Server ---
+  nginx:
+    image: nginx:alpine
     ports:
       - "8080:80"
     volumes:
-      # Persist SQLite database across restarts
-      - db_data:/var/www/html/database
-      # Persist storage (uploads, logs, cache)
-      - app_storage:/var/www/html/storage
-    environment:
-      APP_ENV: production
-      APP_DEBUG: "false"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/up"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
+      - .:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
 
-  # Optional: Use MySQL instead of SQLite
-  # db:
-  #   image: mysql:8.0
-  #   container_name: taskmanagement_db
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: secret
-  #     MYSQL_DATABASE: taskmanagement
-  #     MYSQL_USER: laravel
-  #     MYSQL_PASSWORD: secret
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #   ports:
-  #     - "3306:3306"
+  # --- Database ---
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: taskmanagement
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U laravel"]
+      interval: 5s
+      retries: 5
 
 volumes:
-  db_data:
-  app_storage:
-  # mysql_data:
+  pgdata:
