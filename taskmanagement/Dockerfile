@@ -20,11 +20,13 @@ COPY . .
 # Set up .env before composer install so artisan scripts work
 RUN cp .env.example .env
 
-# Install dependencies (unlimited memory for composer)
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --optimize-autoloader
+# Install dependencies — skip post-install scripts (artisan runs after key is set)
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts
 
-# Generate app key and create required directories
+# Generate app key, run autoloader optimisation, then discover packages
 RUN php artisan key:generate \
+    && composer dump-autoload --optimize \
+    && php artisan package:discover --ansi \
     && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
