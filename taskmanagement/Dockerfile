@@ -14,13 +14,17 @@ RUN curl -sS https://getcomposer.org/installer \
 
 WORKDIR /var/www/html
 
-# Copy source code and install dependencies
+# Copy source code
 COPY . .
-RUN composer install --no-interaction --prefer-dist
+
+# Set up .env before composer install so artisan scripts work
+RUN cp .env.example .env
+
+# Install dependencies (unlimited memory for composer)
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Generate app key and create required directories
-RUN cp .env.example .env \
-    && php artisan key:generate \
+RUN php artisan key:generate \
     && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
