@@ -1,0 +1,25 @@
+services:
+  backend:
+    image: registry.gitlab.com/k1m0ch1/kube-workshop/backend:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend-data:/data
+    networks:
+      - kube-workshop
+
+  frontend:
+    image: registry.gitlab.com/k1m0ch1/kube-workshop/frontend:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - kube-workshop
+
+volumes:
+  backend-data:
+
+networks:
+  kube-workshop:
+    name: kube-workshop

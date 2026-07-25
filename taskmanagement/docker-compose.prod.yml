@@ -1,0 +1,63 @@
+services:
+
+  # --- Database ---
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: taskmanagement
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - kube-workshop
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U laravel -d taskmanagement"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # --- PHP Application (Laravel) ---
+  app:
+    image: registry.gitlab.com/k1m0ch1/kube-workshop/taskmanagement:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: taskmanagement
+      DB_USERNAME: laravel
+      DB_PASSWORD: secret
+    networks:
+      - kube-workshop
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm -t 2>&1 | grep -q 'configuration file' && echo ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # --- Web Server ---
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - kube-workshop
+
+volumes:
+  pgdata:
+
+networks:
+  kube-workshop:
+    external: true
