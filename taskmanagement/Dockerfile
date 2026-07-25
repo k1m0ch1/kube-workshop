@@ -26,7 +26,7 @@ RUN composer config --global policy.advisories.block false \
     && COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts
 
 # Create required directories, generate key, discover packages, fix permissions
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
     && php artisan key:generate \
     && composer dump-autoload --optimize \
     && php artisan package:discover --ansi \
