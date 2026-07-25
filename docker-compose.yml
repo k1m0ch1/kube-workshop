@@ -5,6 +5,8 @@ services:
       - "8000:8000"
     volumes:
       - backend-data:/data
+    networks:
+      - kube-workshop
 
   frontend:
     build: ./frontend
@@ -12,6 +14,12 @@ services:
       - "8080:80"
     depends_on:
       - backend
+    networks:
+      - kube-workshop
 
 volumes:
   backend-data:
+
+networks:
+  kube-workshop:
+    name: kube-workshop
