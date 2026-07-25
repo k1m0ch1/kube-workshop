@@ -25,12 +25,12 @@ RUN cp .env.example .env
 RUN composer config --global policy.advisories.block false \
     && COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts
 
-# Generate app key, run autoloader optimisation, then discover packages
-RUN php artisan key:generate \
+# Create required directories first, then generate key and discover packages
+RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && php artisan key:generate \
     && composer dump-autoload --optimize \
-    && php artisan package:discover --ansi \
-    && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && php artisan package:discover --ansi
 
 # Entrypoint runs migrations then starts PHP-FPM
 COPY docker/entrypoint.sh /entrypoint.sh
