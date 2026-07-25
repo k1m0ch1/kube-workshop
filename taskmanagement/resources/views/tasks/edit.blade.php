@@ -14,7 +14,7 @@
 
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <form method="POST" action="{{ route('tasks.update', $task) }}">
+                <form method="POST" action="{{ route('tasks.update', $task) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -76,6 +76,24 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="attachment" class="form-label fw-semibold">Attachment</label>
+                        @if($task->attachment)
+                            <div class="mb-2">
+                                <a href="{{ Storage::url($task->attachment) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-paperclip me-1"></i>{{ basename($task->attachment) }}
+                                </a>
+                                <span class="text-muted small ms-2">Upload a new file to replace it.</span>
+                            </div>
+                        @endif
+                        <input type="file" class="form-control @error('attachment') is-invalid @enderror"
+                               id="attachment" name="attachment">
+                        <div class="form-text">Max 10 MB. Leave empty to keep existing attachment.</div>
+                        @error('attachment')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="d-flex gap-2 justify-content-between pt-2 border-top">

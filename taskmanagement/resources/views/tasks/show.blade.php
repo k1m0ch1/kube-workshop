@@ -48,6 +48,15 @@
                     </div>
                 @endif
 
+                @if($task->attachment)
+                    <div class="mb-4">
+                        <div class="text-muted small mb-1">Attachment</div>
+                        <a href="{{ Storage::url($task->attachment) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-paperclip me-1"></i>{{ basename($task->attachment) }}
+                        </a>
+                    </div>
+                @endif
+
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <div class="text-muted small mb-1">Created</div>

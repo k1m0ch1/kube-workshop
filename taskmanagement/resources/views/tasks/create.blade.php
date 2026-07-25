@@ -14,7 +14,7 @@
 
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <form method="POST" action="{{ route('tasks.store') }}">
+                <form method="POST" action="{{ route('tasks.store') }}" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">
@@ -75,6 +75,16 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="attachment" class="form-label fw-semibold">Attachment</label>
+                        <input type="file" class="form-control @error('attachment') is-invalid @enderror"
+                               id="attachment" name="attachment">
+                        <div class="form-text">Max 10 MB. Any file type accepted.</div>
+                        @error('attachment')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="d-flex gap-2 justify-content-end pt-2 border-top">

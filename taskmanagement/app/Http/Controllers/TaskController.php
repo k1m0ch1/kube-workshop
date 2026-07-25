@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class TaskController extends Controller
@@ -61,7 +62,13 @@ class TaskController extends Controller
             'status'      => 'required|in:pending,in_progress,completed',
             'priority'    => 'required|in:low,medium,high',
             'due_date'    => 'nullable|date',
+            'attachment'  => 'nullable|file|max:10240',
         ]);
+
+        if ($request->hasFile('attachment')) {
+            $validated['attachment'] = $request->file('attachment')
+                ->store('attachments', 'public');
+        }
 
         Task::create($validated);
 
@@ -89,16 +96,29 @@ class TaskController extends Controller
             'status'      => 'required|in:pending,in_progress,completed',
             'priority'    => 'required|in:low,medium,high',
             'due_date'    => 'nullable|date',
+            'attachment'  => 'nullable|file|max:10240',
         ]);
+
+        if ($request->hasFile('attachment')) {
+            if ($task->attachment) {
+                Storage::disk('public')->delete($task->attachment);
+            }
+            $validated['attachment'] = $request->file('attachment')
+                ->store('attachments', 'public');
+        }
 
         $task->update($validated);
 
-        return redirect()->route('tasks.index')
+        return redirect()->route('tasks.show', $task)
             ->with('success', 'Task updated successfully!');
     }
 
     public function destroy(Task $task): RedirectResponse
     {
+        if ($task->attachment) {
+            Storage::disk('public')->delete($task->attachment);
+        }
+
         $task->delete();
 
         return redirect()->route('tasks.index')
