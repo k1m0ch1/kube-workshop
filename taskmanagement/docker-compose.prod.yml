@@ -38,7 +38,7 @@ services:
     networks:
       - kube-workshop
     healthcheck:
-      test: ["CMD-SHELL", "php -r \"fsockopen('127.0.0.1', 9000) or exit(1);\""]
+      test: ["CMD", "php", "-r", "fsockopen('127.0.0.1', 9000) or exit(1);"]
       interval: 10s
       timeout: 5s
       retries: 10
