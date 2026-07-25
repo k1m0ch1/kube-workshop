@@ -36,7 +36,7 @@ services:
     networks:
       - kube-workshop
     healthcheck:
-      test: ["CMD-SHELL", "php-fpm -t 2>&1 | grep -q 'configuration file' && echo ok"]
+      test: ["CMD", "php-fpm", "-t"]
       interval: 10s
       timeout: 5s
       retries: 5
